@@ -29,7 +29,6 @@ class Roboraj(object):
         def increment():
             with open("increment.txt", "r") as f:
                 count = int(f.read())
-            print count
             with open("increment.txt", "w") as f:  # save current date when app starts
                 f.write(str(count + 1))
             return count + 1
@@ -44,10 +43,10 @@ class Roboraj(object):
         key = ''
         while key != ord('q'):
             key = stdscr.getch()
-            stdscr.refresh()
             if key == ord(" "):
                 count = increment()
                 resp = "{0} count: {1}".format(word, count)
                 self.irc.send_message(channel, resp)
+                stdscr.refresh()
 
         curses.endwin()
