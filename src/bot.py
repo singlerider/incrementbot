@@ -14,9 +14,13 @@ import sched
 import time
 import threading
 import os
+import curses
 
-END = False
-
+channel = "#singlerider"
+word = raw_input("What's the word we're counting here?")
+initial_count = raw_input("What number are we starting at?")
+with open("increment.txt", "w") as f:  # save current date when app starts
+    f.write(initial_count)
 
 class Roboraj(object):
 
@@ -26,22 +30,28 @@ class Roboraj(object):
 
     def run(self):
 
+        def increment():
+            with open("increment.txt", "r") as f:
+                count = int(f.read())
+            print count
+            with open("increment.txt", "w") as f:  # save current date when app starts
+                f.write(str(count + 1))
+            return count + 1
+
         config = self.config
 
-        while True:
-            try:
-                data = self.irc.nextMessage()
-                if not self.irc.check_for_message(data):
-                    continue
-                message_dict = self.irc.get_message(data)
-                channel = message_dict['channel']
-                message = message_dict['message']  # .lower()
-                username = message_dict['username']
-                part = message.split(' ')[0]
-                #valid = False
-                #if not valid:
-                #    continue
-                self.irc.send_message(channel, message)
+        stdscr = curses.initscr()
+        curses.cbreak()
+        stdscr.keypad(1)
+        stdscr.addstr(0, 10, "Hit 'spacebar' to increment or 'q' to quit")
+        stdscr.refresh()
+        key = ''
+        while key != ord('q'):
+            key = stdscr.getch()
+            stdscr.refresh()
+            if key == ord(" "):
+                count = increment()
+                resp = "{0} count: {1}".format(word, count)
+                self.irc.send_message(channel, resp)
 
-            except Exception as error:
-                print error
+        curses.endwin()
