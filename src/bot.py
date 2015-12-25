@@ -16,7 +16,7 @@ from lib.functions_general import *
 import src.lib.incoming_data as incoming_data
 
 channel = config.channel
-print channel
+print channel  # channel connecting to
 word = '"{0}"'.format(raw_input("What's the word we're counting here? "))
 try:
     initial_count = str(int(raw_input("What number are we starting at? ")))
@@ -42,15 +42,13 @@ class Roboraj(object):
             return count + 1
 
         def get_greeting(word, count):
-            greeting = "Hit 'spacebar' to increment or 'q' to quit. {0} count: {1}".format(
+            greeting = "Hit 'spacebar' to increment or 'escape' to quit.\n{0} count: {1}".format(
                 word, count)
             return greeting
 
         config = self.config
 
-        count = initial_count
-
-        def initiate_screen():
+        def initiate_screen(word, count):
             screen = curses.initscr()
             curses.noecho()
             curses.curs_set(0)
@@ -58,11 +56,12 @@ class Roboraj(object):
             screen.addstr(get_greeting(word, count))
             return screen
 
-        screen = initiate_screen()
+        count = initial_count
+        screen = initiate_screen(word, count)
         key = ''
         while True:
             event = screen.getch()
-            if event == ord("q"):
+            if event == 27:
                 curses.endwin()
                 sys.exit()
             elif event == ord(" "):
