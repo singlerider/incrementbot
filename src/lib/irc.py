@@ -128,14 +128,16 @@ class irc:
         self.join_channels(self.channels_to_string(self.config['channels']))
 
     def channels_to_string(self, channel_list):
-        return ','.join(channel_list)
+        channels = [''.join(channel_list)]
+        print channels
+        return channels
 
     def join_channels(self, channels):
-        print('Joining channels %s.' % channels)
-        self.sock.send('JOIN %s\r\n' % channels)
+        print('Joining channels %s.' % channels[0])
+        self.sock.send('JOIN %s\r\n' % channels[0])
         print('Joined channels.')
 
     def leave_channels(self, channels):
-        print('Leaving channels %s,' % channels)
-        self.sock.send('PART %s\r\n' % channels)
+        print('Leaving channels %s,' % channels[0])
+        self.sock.send('PART %s\r\n' % channels[0])
         print('Left channels.')
