@@ -11,8 +11,10 @@ import time
 import threading
 import os
 import curses
+import src.config.config as config
 
-channel = "#uknighted"
+channel = config.channel
+print channel
 word = raw_input("What's the word we're counting here? ")
 initial_count = raw_input("What number are we starting at? ")
 with open("increment.txt", "w") as f:  # save current date when app starts
@@ -29,7 +31,7 @@ class Roboraj(object):
         def increment():
             with open("increment.txt", "r") as f:
                 count = int(f.read())
-            with open("increment.txt", "w") as f:  # save current date when app starts
+            with open("increment.txt", "w") as f:
                 f.write(str(count + 1))
             return count + 1
 
