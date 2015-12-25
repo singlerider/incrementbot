@@ -8,10 +8,9 @@ Make a copy of the example config file:
 
 `cp src/config/config_example.py src/config/config.py`
 
-#### Globals and Config File
+#### Config File
 
-Head into src/config/config.py and enter the correct channels you'd like to join
-and your login credentials.
+Head into src/config/config.py and enter the correct channel you'd like to join and your login credentials.
 
 ## Finally
 
