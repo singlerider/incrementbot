@@ -1,9 +1,5 @@
 """
-Intricate Chat Bot for Twitch.tv
-
-By Shane Engelman <me@5h4n3.com>
-
-Contributions from dustinbcox and theepicsnail
+incrementor for words in a Twitch chat
 """
 
 import lib.irc as irc_
@@ -16,9 +12,9 @@ import threading
 import os
 import curses
 
-channel = "#singlerider"
-word = raw_input("What's the word we're counting here?")
-initial_count = raw_input("What number are we starting at?")
+channel = "#uknighted"
+word = raw_input("What's the word we're counting here? ")
+initial_count = raw_input("What number are we starting at? ")
 with open("increment.txt", "w") as f:  # save current date when app starts
     f.write(initial_count)
 
