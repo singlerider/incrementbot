@@ -42,7 +42,7 @@ def add_word():
                 n += 1
                 continue
         except Exception as error:
-            print error
+            print "That didn't work. I can't find a unique key from '{0}' that hasn't been used.".format(word)
             break
     continue_adding = raw_input("Would you like to add another word? (y/N) ")
     if "y" in continue_adding.lower():
