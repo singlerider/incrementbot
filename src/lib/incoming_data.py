@@ -10,7 +10,6 @@ def initialize(irc, config):
     #   ...
     # }
     channel = config
-    print "channel", channel
     IncomingData(irc, channel).start()
 
 
@@ -27,5 +26,3 @@ class IncomingData(Thread):
             # print(self.callback, self.channel)
             data = self.irc.nextMessage()
             self.irc.check_for_ping(data)
-            if self.irc.check_for_message(data):
-                print self.irc.get_message(data)
