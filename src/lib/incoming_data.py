@@ -3,12 +3,6 @@ from threading import Thread
 
 
 def initialize(irc, config):
-    # start up the cron jobs.
-    # config should be in the structure of
-    # {
-    #   "#channel": [ (period, enabled, callback),.... ]
-    #   ...
-    # }
     channel = config
     IncomingData(irc, channel).start()
 

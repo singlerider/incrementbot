@@ -14,17 +14,19 @@ import src.config.config as config
 from threading import Thread
 from lib.functions_general import *
 import src.lib.incoming_data as incoming_data
+import src.lib.cron as cron
 import json
 
 words = {}
 keys = {}
+changes = {}
 channel = config.channel
 print channel  # channel connecting to
 
 
 # A recursive function to add a word to the dict of words to be counted
 def add_word():
-    word = '{0}'.format(raw_input("What's the word we're counting here? "))
+    word = raw_input("What's the word we're counting here? ")
     try:
         initial_count = str(int(raw_input("What number are we starting at? ")))
     except:
@@ -52,6 +54,30 @@ def add_word():
     with open("keys.json", "w") as f:  # open keys.json
         f.write(json.dumps(keys))  # write converted dict to file as json
 
+
+def cron_job(channel):
+    with open("changes.json", "r") as f:  # read changes.json
+        changes = json.loads(f.read())  # convert to dict
+    with open("changes.json", "w") as f:  # open changes.json
+        f.write(json.dumps({}))  # write an empty dict to file
+    # {word1: count, word2: count}
+    # list comprehension for the chat message return
+    word_list = ", ".join([x + " count: " + str(
+        changes[x] + 1) for x in changes])
+    return word_list
+
+delay = 0  # initiate a variable in the proper scope
+enable_cron = raw_input("Would you like to send changes on a timer? (y/N) ")
+if "y" in enable_cron.lower():  # "yes"/"Yeah"/"y"
+    try:  # make sure a positive, nonzero integer value is entered
+        delay = abs(int(raw_input(
+            "How many seconds between checks? (int) ")))
+        if delay <= 5:
+            delay = 5
+    except:  # if something other than a convertable int is entered
+        delay = 5  # reset the delay to a number
+print str(delay) + " seconds"
+
 # use_previous will decide if the previous count will be used
 use_previous = raw_input("Would you like to use the last used counts? (y/N) ")
 if "y" in use_previous.lower():  # "yes"/"Yeah"/"y"
@@ -68,12 +94,20 @@ if "y" in use_previous.lower():  # "yes"/"Yeah"/"y"
 else:  # if it's not decided to reuse the previous count
     add_word()  # add words
 
+with open("changes.json", "w") as f:
+    f.write(json.dumps({}))
+
 
 class Roboraj(object):
 
     def __init__(self, config):
         self.config = config  # use config.py as this instance's config
         self.irc = irc_.irc(config)  # use irc.py for socket connections
+        if "y" in enable_cron.lower():
+            cron.initialize(
+                self.irc, self.config.get('channels', {}), (
+                    delay, cron_job))
+            print "CRON ENABLED"
         # asyncronously check for incoming PINGs and send PONGs to server
         incoming_data.initialize(self.irc, self.config.get('channels', {}))
 
@@ -120,5 +154,14 @@ class Roboraj(object):
                     count = increment(word, count)  # add one to count
                     screen.addstr(get_greeting(words))  # display new greeting
                     resp = "{0} count: {1}".format(word, count + 1)
+                    if "y" in enable_cron.lower():
+                        with open("changes.json", "r") as f:  # read changes
+                            changes = json.loads(f.read())  # convert to dict
+                        print "changes[word]", changes, type(changes)
+                        print "count", count
+                        changes[word] = count  # assign the new count
+                        with open("changes.json", "w") as f:
+                            f.write(json.dumps(changes))
                     # submit corresponding word and count to stream chat
-                    self.irc.send_message(channel, resp)
+                    else:  # if the cron job is disabled
+                        self.irc.send_message(channel, resp)
