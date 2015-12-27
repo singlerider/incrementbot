@@ -8,6 +8,8 @@ All it takes is pressing whichever key gets assigned to a particular phrase you 
 
 That's it!
 
+![Screencapture GIF](http://i.imgur.com/prY6gqH.gif)
+
 ## Installation
 
 Make a copy of the example config file:
