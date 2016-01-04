@@ -5,7 +5,7 @@ from threading import Thread
 def initialize(irc, config, job):
     # job = (60, bot.cron)
     channel = config
-    print "channel:", channel
+    print("channel:", channel)
     delay = job[0]
     callback = job[1]
     CronJob(irc, channel, delay, callback).start()

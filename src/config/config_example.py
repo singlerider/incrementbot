@@ -10,7 +10,7 @@ oauth_password = "oauth:n8urn832r238273nd82"
 # #### Do not edit the lines below
 channel = "#" + channel.lstrip("#")  # Leave this line alone
 if channel == "#":
-    channel = "#" + raw_input(
+    channel = "#" + input(
         "No channel specified in config. Which channel would you like to join? "
         ).lstrip("#")
 

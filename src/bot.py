@@ -2,7 +2,7 @@
 incrementor for words in a Twitch chat
 """
 
-import lib.irc as irc_
+import src.lib.irc as irc_
 import sys
 import datetime
 import traceback
@@ -12,7 +12,7 @@ import os
 import curses
 import src.config.config as config
 from threading import Thread
-from lib.functions_general import *
+from .lib.functions_general import *
 import src.lib.incoming_data as incoming_data
 import src.lib.cron as cron
 import json
@@ -21,14 +21,14 @@ words = {}
 keys = {}
 changes = {}
 channel = config.channel
-print channel  # channel connecting to
+print(channel)  # channel connecting to
 
 
 # A recursive function to add a word to the dict of words to be counted
 def add_word():
-    word = raw_input("What's the word we're counting here? ")
+    word = input("What's the word we're counting here? ")
     try:
-        initial_count = str(int(raw_input("What number are we starting at? ")))
+        initial_count = str(int(input("What number are we starting at? ")))
     except:
         initial_count = "0"
     words[word] = initial_count  # word: number {"AI": 2, "pmc": "7"}
@@ -40,15 +40,15 @@ def add_word():
         try:
             if word[n].lower() not in keys:  # uses incrementor to check letter
                 keys[word[n].lower()] = word  # {"a": "AI", "p": "pmc"}
-                print {word[n].lower(): {word: initial_count}}
+                print({word[n].lower(): {word: initial_count}})
                 break  # escape the while loop
             if word[n] in keys:
                 n += 1  # try the next letter if the previous is used
                 continue  # go back to the beginning of the loop
         except Exception as error:  # happens without unique characters
-            print "That didn't work. I can't find a unique key from '{0}' that hasn't been used.".format(word)
+            print(("That didn't work. I can't find a unique key from '{0}' that hasn't been used.".format(word)))
             break  # escape the while loop
-    continue_adding = raw_input("Would you like to add another word? (y/N) ")
+    continue_adding = input("Would you like to add another word? (y/N) ")
     if "y" in continue_adding.lower():  # "yes"/"Yeah"/"y"
         add_word()  # add words
     with open("keys.json", "w") as f:  # open keys.json
@@ -67,19 +67,19 @@ def cron_job(channel):
     return word_list
 
 delay = 0  # initiate a variable in the proper scope
-enable_cron = raw_input("Would you like to send changes on a timer? (y/N) ")
+enable_cron = input("Would you like to send changes on a timer? (y/N) ")
 if "y" in enable_cron.lower():  # "yes"/"Yeah"/"y"
     try:  # make sure a positive, nonzero integer value is entered
-        delay = abs(int(raw_input(
+        delay = abs(int(input(
             "How many seconds between checks? (int) ")))
         if delay <= 5:
             delay = 5
     except:  # if something other than a convertable int is entered
         delay = 5  # reset the delay to a number
-print str(delay) + " seconds"
+print((str(delay) + " seconds"))
 
 # use_previous will decide if the previous count will be used
-use_previous = raw_input("Would you like to use the last used counts? (y/N) ")
+use_previous = input("Would you like to use the last used counts? (y/N) ")
 if "y" in use_previous.lower():  # "yes"/"Yeah"/"y"
     try:
         with open("words.json", "r") as f:  # read words.json
@@ -89,7 +89,7 @@ if "y" in use_previous.lower():  # "yes"/"Yeah"/"y"
     except:  # happens if there is no previous counts files
         words = {}  # reset words dict
         keys = {}  # reset keys dict
-        print "No previous counts found. Starting a new count:"
+        print("No previous counts found. Starting a new count:")
         add_word()  # run the function to add words due to failure
 else:  # if it's not decided to reuse the previous count
     add_word()  # add words
@@ -107,7 +107,7 @@ class Roboraj(object):
             cron.initialize(
                 self.irc, self.config.get('channels', {}), (
                     delay, cron_job))
-            print "CRON ENABLED"
+            print("CRON ENABLED")
         # asyncronously check for incoming PINGs and send PONGs to server
         incoming_data.initialize(self.irc, self.config.get('channels', {}))
 
@@ -157,8 +157,8 @@ class Roboraj(object):
                     if "y" in enable_cron.lower():
                         with open("changes.json", "r") as f:  # read changes
                             changes = json.loads(f.read())  # convert to dict
-                        print "changes[word]", changes, type(changes)
-                        print "count", count
+                        # print(("changes[word]", changes, type(changes)))
+                        # print(("count", count))
                         changes[word] = count  # assign the new count
                         with open("changes.json", "w") as f:
                             f.write(json.dumps(changes))
