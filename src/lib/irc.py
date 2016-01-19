@@ -60,7 +60,6 @@ class irc:
         # if data[0:4] == "PING":
         if data.find('PING') != -1:
             self.sock.send(str('PONG ' + data.split()[1] + '\r\n').encode())
-            print("It worked!")
             last_ping = time.time()
         if (time.time() - last_ping) > threshold:
             sys.exit()
