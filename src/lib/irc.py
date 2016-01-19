@@ -4,6 +4,7 @@ import re
 import time
 import sys
 import _thread
+import codecs
 
 threshold = 5 * 60  # five minutes, make this whatever you want
 
@@ -23,13 +24,9 @@ class irc:
                 self.connect()  # Reconnect.
             else:
                 self.ircBuffer += read.decode()
-
         line, self.ircBuffer = self.ircBuffer.split("\r\n", 1)
-
-        # print((">>", line))
         if line.startswith("PING"):
-            self.sock.send(line.replace("PING", "PONG") + "\r\n")
-
+            self.sock.send(str(line.replace("PING", "PONG") + "\r\n").encode())
         return line
 
     def check_for_message(self, data):
@@ -59,11 +56,11 @@ class irc:
             #:lorenzotherobot.tmi.twitch.tv 353 lorenzotherobot = #curvyllama :l0rd_bulldog agentsfire workundercover69 the_polite_zombie jalenxweezy13 curvyllama hmichaelh2015 steven0405 armypenguin91 hionas22 prophecymxxm singlerider bentleet tesylesor vipervenom2u zombiesdelux115 lorenzotherobot nerdy0rgyparty michaelcycle gewgled jconnfilm rustemperor frozelio
 
     def check_for_ping(self, data):
-
         last_ping = time.time()
         # if data[0:4] == "PING":
         if data.find('PING') != -1:
-            self.sock.send('PONG ' + data.split()[1] + '\r\n')
+            self.sock.send(str('PONG ' + data.split()[1] + '\r\n').encode())
+            print("It worked!")
             last_ping = time.time()
         if (time.time() - last_ping) > threshold:
             sys.exit()
@@ -86,10 +83,8 @@ class irc:
         #  -- [["1", ["2", "3"]], "4"] will send "1", "2", "3", "4".
         if not message:
             return
-
         if isinstance(message, str):
             self.sock.send('PRIVMSG %s :%s\r\n'.encode() % (channel.encode(), message.encode()))
-
         if type(message) == list:
             for line in message.decode("utf8"):
                 self.send_message(channel, line)
@@ -97,7 +92,6 @@ class irc:
     def connect(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(10)
-
         try:
             print(("Connecting to {}:{}".format(self.config['server'], self.config['port'])))
             sock.connect((self.config['server'], self.config['port']))
@@ -106,12 +100,10 @@ class irc:
                (self.config['server'], self.config['port']), 'error'))
             sys.exit()
         sock.settimeout(None)
-
         sock.send('USER %s\r\n'.encode() % self.config['username'].encode())
         sock.send('PASS %s\r\n'.encode() % self.config['oauth_password'].encode())
         sock.send('NICK %s\r\n'.encode() % self.config['username'].encode())
         self.sock = sock
-
         loginMsg = self.nextMessage()
         #:tmi.twitch.tv NOTICE * :Login unsuccessful
         # or
@@ -119,11 +111,9 @@ class irc:
         if "unsuccessful" in loginMsg:
             print("Failed to login. Check your oath_password and username in src/config/config.py")
             sys.exit(1)
-
         # Wait until we're ready before starting stuff.
         while "376" not in self.nextMessage():
             pass
-
         self.join_channels(self.channels_to_string(self.config['channels']))
 
     def channels_to_string(self, channel_list):
