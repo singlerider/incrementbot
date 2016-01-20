@@ -46,7 +46,9 @@ def add_word():
                 n += 1  # try the next letter if the previous is used
                 continue  # go back to the beginning of the loop
         except Exception as error:  # happens without unique characters
-            print(("That didn't work. I can't find a unique key from '{0}' that hasn't been used.".format(word)))
+            print(
+                ("That didn't work. I can't find a unique key from '{0}'" +
+                    " that hasn't been used.".format(word)))
             break  # escape the while loop
     continue_adding = input("Would you like to add another word? (y/N) ")
     if "y" in continue_adding.lower():  # "yes"/"Yeah"/"y"
